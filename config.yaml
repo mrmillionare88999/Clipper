@@ -1,0 +1,23 @@
+# Set to true ONLY if you own every source below or have written permission/licence to clip it.
+rights_confirmed: false
+
+# Channels or playlists to clip from (your own channel, or creators who have authorised you).
+sources:
+  - https://www.youtube.com/@YOUR_CHANNEL/videos
+
+scan_latest: 5            # newest N videos checked per source each run
+max_videos_per_run: 1     # keep runs short on the free scheduler
+max_uploads_per_day: 5    # YouTube API default quota allows ~6 uploads/day
+
+clips_per_video: 3
+min_clip_seconds: 25
+max_clip_seconds: 55
+
+whisper_model: base       # tiny = fastest, small = more accurate
+use_claude: true          # uses ANTHROPIC_API_KEY if set, else keyword heuristic
+claude_model: claude-sonnet-5-5
+
+privacy: public           # public | unlisted | private
+category_id: 24           # 24 = Entertainment, 22 = People & Blogs, 27 = Education
+tags: [shorts, clips, highlights]
+description_template: "From: {title}\nFull video: {url}"
