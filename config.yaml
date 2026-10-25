@@ -1,11 +1,17 @@
-# Set to true ONLY if you own every source below or have written permission/licence to clip it.
-rights_confirmed: false
+# With require_cc_license: true, every video's licence is checked and only videos marked
+# "Creative Commons Attribution" are clipped. Credit to the creator is added automatically.
+# Set rights_confirmed to true only if you accept this (or you own/are licensed for your sources).
+rights_confirmed: true
+require_cc_license: true
+min_source_seconds: 180   # ignore source videos shorter than 3 minutes
 
-# Channels or playlists to clip from (your own channel, or creators who have authorised you).
+# Sources: YouTube search filtered to Creative Commons videos (the sp= part), or any channel/playlist URL.
+# Change the search words to the niche you want. Add more lines for more niches.
 sources:
-  - https://www.youtube.com/@YOUR_CHANNEL/videos
+  - "https://www.youtube.com/results?search_query=podcast+interview&sp=EgIwAQ%253D%253D"
+  - "https://www.youtube.com/results?search_query=motivation+speech&sp=EgIwAQ%253D%253D"
 
-scan_latest: 5            # newest N videos checked per source each run
+scan_latest: 15           # videos looked at per source each run (many will be skipped)
 max_videos_per_run: 1     # keep runs short on the free scheduler
 max_uploads_per_day: 5    # YouTube API default quota allows ~6 uploads/day
 
@@ -20,4 +26,4 @@ claude_model: claude-sonnet-5-5
 privacy: public           # public | unlisted | private
 category_id: 24           # 24 = Entertainment, 22 = People & Blogs, 27 = Education
 tags: [shorts, clips, highlights]
-description_template: "From: {title}\nFull video: {url}"
+description_template: "Clip from \"{title}\" by {channel}\nOriginal video: {url}\nLicensed under Creative Commons Attribution (CC BY). Changes made: cropped, captioned and shortened."

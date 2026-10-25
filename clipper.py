@@ -56,6 +56,14 @@ def list_new_videos(source_url, limit):
     return [e for e in (info.get("entries") or []) if e and e.get("id")]
 
 
+def video_info(video_id):
+    """Full metadata for one video (licence, channel name, duration)."""
+    from yt_dlp import YoutubeDL
+
+    with YoutubeDL(ydl_opts({"skip_download": True})) as ydl:
+        return ydl.extract_info(f"https://www.youtube.com/watch?v={video_id}", download=False)
+
+
 def download(video_id):
     from yt_dlp import YoutubeDL
 
@@ -254,6 +262,21 @@ def main():
             if processed >= CFG["max_videos_per_run"] or uploaded_today >= CFG["max_uploads_per_day"]:
                 break
             title = entry.get("title") or vid
+            channel = entry.get("channel") or entry.get("uploader") or "the original creator"
+            if CFG.get("require_cc_license"):
+                try:
+                    info = video_info(vid)
+                except Exception as e:  # noqa: BLE001
+                    log.warning("Could not read info for %s: %s", vid, e)
+                    continue
+                lic = (info.get("license") or "").lower()
+                duration = info.get("duration") or 0
+                if "creative commons" not in lic or duration < CFG.get("min_source_seconds", 180):
+                    state["done"].append(vid)  # not CC or too short: never check again
+                    save_state(state)
+                    continue
+                channel = info.get("channel") or info.get("uploader") or channel
+                title = info.get("title") or title
             log.info("Processing %s (%s)", vid, title)
             try:
                 src = download(vid)
@@ -268,7 +291,8 @@ def main():
                     if dry:
                         log.info("DRY RUN: rendered %s (%s)", out, clip["title"])
                         continue
-                    desc = CFG["description_template"].format(title=title, url=f"https://youtu.be/{vid}")
+                    desc = CFG["description_template"].format(
+                        title=title, channel=channel, url=f"https://youtu.be/{vid}")
                     new_id = upload_youtube(out, clip["title"], desc)
                     log.info("Uploaded https://youtube.com/shorts/%s", new_id)
                     uploaded_today += 1
